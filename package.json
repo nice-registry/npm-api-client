@@ -1,0 +1,62 @@
+{
+  "name": "npm-api-client",
+  "description": "A self-generating client for npm's new registry API",
+  "version": "1.5.0",
+  "author": "Zeke Sikelianos <zeke@sikelianos.com> (http://zeke.sikelianos.com/)",
+  "bugs": {
+    "url": "https://github.com/zeke/npm-api-client/issues"
+  },
+  "config": {
+    "blanket": {
+      "pattern": "lib",
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ],
+      "output-reporter": "spec"
+    }
+  },
+  "dependencies": {
+    "bole": "^2.0.0",
+    "human-interval": "^0.1.4",
+    "is-url": "^1.2.0",
+    "is_js": "^0.7.3",
+    "lodash": "^3.7.0",
+    "redis-url": "^1.2.0",
+    "request": "^2.55.0",
+    "request-object-fingerprint": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel": "^5.0.12",
+    "blanket": "^1.1.6",
+    "code": "^1.4.0",
+    "handlebars": "^3.0.1",
+    "js-yaml": "^3.2.7",
+    "mocha": "^2.2.4",
+    "mocoverage": "^1.0.0",
+    "nock": "^1.6.0",
+    "shelljs": "^0.4.0",
+    "sinon": "^1.14.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "homepage": "https://github.com/zeke/npm-api-client",
+  "keywords": [
+    "acl",
+    "api",
+    "client",
+    "npm",
+    "user-acl"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zeke/npm-api-client"
+  },
+  "scripts": {
+    "build": "node src/build.js",
+    "test": "npm run build && mocha dist/test/*.js --timeout 1000 --check-leaks --ui exports"
+  }
+}

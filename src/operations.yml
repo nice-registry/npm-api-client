@@ -1,0 +1,282 @@
+# Packages
+
+-
+  name: packages.get
+  description: Get metadata for a specific npm package
+  path: /package/{packageName}
+  method: GET
+-
+  name: packages.list
+  description: Get collections of packages, sorted various ways
+  path: /package
+  method: GET
+-
+  name: packages.count
+  description: Get a count of all the public packages in the registry
+  path: /package/-/count
+  method: GET
+-
+  name: packages.star
+  description: Star a package
+  path: /package/{packageName}/star
+  method: PUT
+-
+  name: packages.perms
+  description: "Get an aggregate permissions object for a package.
+    This endpoint is used internally by the cache."
+  path: /package/{packageName}/perms
+  method: GET
+-
+  name: packages.delete
+  description: Delete a package. Meant for admin purposes, such as unpublish.
+  path: /package/{packageName}
+  method: DELETE
+-
+  name: packages.create
+  description: create a new package (infers whether org or user based on scope).
+  path: /package
+  method: PUT
+-
+  name: packages.getDefaultTeam
+  description: "Get the default team for the package. Bearer user must be
+    super-admin, team-admin of the default team or owner of the package"
+  path: /package/{packageName}/default-team
+  method: GET
+
+# Collaborators
+
+-
+  name: collaborators.list
+  description: Get all collaborators on a package
+  path: /package/{packageName}/collaborators
+  method: GET
+-
+  name: collaborators.add
+  description: Add a new collaborator to a package
+  path: /package/{packageName}/collaborators
+  method: PUT
+-
+  name: collaborators.update
+  description: Update a collaborator
+  path: /package/{packageName}/collaborators/{userName}
+  method: POST
+-
+  name: collaborators.delete
+  description: Remove a collaborator from package
+  path: /package/{packageName}/collaborators/{userName}
+  method: DELETE
+
+# Users
+
+-
+  name: users.create
+  description: Create a new npm user account
+  path: /user
+  method: PUT
+-
+  name: users.update
+  description: Update an npm user account
+  path: /user/{userName}
+  method: POST
+-
+  name: users.get
+  description: Get metdata for a specific user
+  path: /user/{userName}
+  method: GET
+-
+  name: users.delete
+  description: Delete a user
+  path: /user/{userName}
+  method: DELETE
+-
+  name: users.login
+  description: Authenticate a user with username and password.
+  path: /user/{userName}/login
+  method: POST
+-
+  name: users.verify
+  description: Verify a user's email address
+  path: /user/{userName}/verify
+  method: POST
+-
+  name: users.getPackages
+  description: "Get all packages collaborated on by a specific user. A bearer token
+    is provided indicating the user requesting the listing. Returns all packages
+    that user has write access to, and that the user associated with the bearer
+    token has read or write access to."
+  path: /user/{userName}/package
+  method: GET
+-
+  name: users.getStars
+  description: "Get a list of packages starred by the given user."
+  path: /user/{userName}/stars
+  method: GET
+-
+  name: users.createPackage
+  description: Create a placeholder package
+  path: /user/{userName}/package
+  method: PUT
+-
+  name: users.setLicense
+  description: "Associate a license with a user. internal API endpoint, no bearer
+    token required."
+  path: /user/{userName}/license
+  method: POST
+-
+  name: users.getLicense
+  description: Fetch the license associated with a user.
+  path: /user/{userName}/license
+  method: POST
+-
+  name: users.search
+  description: Perform typeahead search based on email or name.
+  path: /user/-/search
+  method: GET
+  options:
+    offset: entries to skip in response.
+    count: how many entries should we return?
+    query: search string
+
+# Teams
+
+-
+  name: teams.update
+  description:  "Update a team's meta-information. Bearer token must be provided,
+    and bearer user must be team-admin or super-admin"
+  path: /team/{teamName}
+  method: POST
+-
+  name: teams.delete
+  description: Delete a team.
+  path: /team/{teamName}
+  method: DELETE
+-
+  name: teams.addPackage
+  description: Add a package to a team. Bearer token must be provided, and bearer user must be team-admin or super-admin.
+  path: /team/{teamName}/package
+  method: POST
+-
+  name: teams.removePackage
+  description: "Remove a package from the team. Bearer token must be provided,
+    and bearer user must be team-admin or super-admin"
+  path: /team/{teamName}/package
+  method: DELETE
+-
+  name: teams.addUser
+  description: Add a user to the team. Bearer user must be team-admin or super-admin
+  path: /team/{teamName}/user
+  method: POST
+-
+  name: teams.removeUser
+  description: Remove a user from the team. Bearer user must be team-admin or super-admin
+  path: /team/{teamName}/user
+  method: DELETE
+
+# Orgs
+
+-
+  name: orgs.create
+  description: Create an organization.
+  path: /org
+  method: PUT
+-
+  name: orgs.get
+  description: Get an organization's meta information.
+  path: /org/{orgName}
+  method: GET
+-
+  name: orgs.delete
+  description: Delete an organization. Bearer token must be provided, and bearer user must be a super-admin of org.
+  path: /org/{orgName}
+  method: DEL
+-
+  name: orgs.update
+  description: update the organization's meta information. bearer token must be provided. bearer must be a super-admin of the org.
+  path: /org/{orgName}
+  method: POST
+-
+  name: orgs.addUser
+  description: "Add a user to the organization. Bearer token must be provided.
+    Bearer must be a super-admin of the org"
+  path: /org/{orgName}/user
+  method: PUT
+-
+  name: orgs.users.list
+  description: "Get users within organization. TODO: we should allow users to announce
+    whether or not they are within the org. Currently we default to this information being public."
+  path: /org/{orgName}/user
+  method: GET
+-
+  name: orgs.users.delete
+  description: Delete user from organization. Bearer token must be provided, and bearer must be super-admin of organization.
+  path: /org/{orgName}/user
+  method: DEL
+-
+  name: orgs.users.update
+  description: "Update a user's role within the organization. Bearer token must be provided.
+    Bearer must be super-admin of organization"
+  path: /org/{orgName}/user/{userName}
+  method: POST
+-
+  name: orgs.packages.list
+  description: "Get all packages within organization. Bearer token must be provided. If bearer is not
+    part of org, public packages for org are returned. If bearer is developer, or team-admin, packages
+    for teams that they are on are returned. If the bearer is a super-admin of the org, all packages
+    for the org are returned."
+  path: /org/{orgName}/package
+  method: GET
+-
+  name: orgs.packages.create
+  description: Create a package. Bearer token must be provided, and bearer must be member of organization.
+  path: /org/{orgName}/package
+  method: PUT
+-
+  name: orgs.teams.list
+  description: "Get all teams within the organization. Bearer token must be provided.
+    Bearer must be member of organization. If bearer is developer a list of all the
+    teams that they are part of is returned. If bearer is team-admin or super-admin,
+    a list of all teams is returned."
+  path: /org/{orgName}/team
+  method: GET
+-
+  name: orgs.teams.create
+  description: Create a team. Bearer token must be provided, and bearer must be super-admin or team-admin.
+  path: /org/{orgName}/team
+  method: PUT
+-
+  name: orgs.listScopes
+  description: List an organization's scopes. Bearer token must be provided. Bearer must be a member of the organization.
+  path: /org/{orgName}/scope
+  method: GET
+-
+  name: orgs.setLicense
+  description: Associate a license with an org by id. Internal API endpoint, no bearer token required.
+  path: /org/{orgName}/license
+  method: POST
+
+# Customers
+
+-
+  name: customers.get
+  description: Fetch a customer record by npm username.
+  path: /stripe/{userName}
+  method: GET
+  host: ACL_CLIENT_CUSTOMER_HOST
+-
+  name: customers.create
+  description: Create a new customer.
+  path: /stripe
+  method: PUT
+  host: ACL_CLIENT_CUSTOMER_HOST
+-
+  name: customers.update
+  description: Create a new customer.
+  path: /stripe/{userName}
+  method: POST
+  host: ACL_CLIENT_CUSTOMER_HOST
+-
+  name: customers.delete
+  description: Delete a customer by npm username.
+  path: /stripe/{userName}
+  method: DELETE
+  host: ACL_CLIENT_CUSTOMER_HOST

@@ -1,0 +1,127 @@
+<!-- README.md is auto-generated. See src/readme.hbs -->
+
+# {{package.name}}
+
+{{{package.description}}}
+
+## Basic Usage
+
+```js
+var npm = require('acl-client')()
+
+npm.packages.get('browserify')
+  .then(function(pkg){ /* yay */ })
+  .catch(function(err){ /* oof */ })
+```
+
+- The client is stateless and has zero configuration.
+- All operations return a [request](http://npm.im/request) request wrapped in a promise.
+- To override the default host of `api.npmjs.com` set `process.env.ACL_CLIENT_HOST`.
+
+## Options
+
+Every request takes an optional `options` object as its last argument. The following options are allowed:
+
+- `ttl` - time in seconds to cache the response in redis. If not set, cache will not be used. Value can also be a human-friendly string like `5 minutes` or `4 hours`.
+- `bearer` - a string of the current username. Can be used if `hapiRequest` is not available. If both `hapiRequest` and `bearer` options are specified, `bearer` takes precedence.
+- `logger` - an object with four methods: `debug`, `info`, `warn`, and `error`. See the [bole API](https://github.com/rvagg/bole#api) for more info.
+- `hapiRequest` - a Hapi request object. If the request is from a logged-in user, this will set `bearer` automatically. The client will also emit log messages using the given request's `logger`.
+
+## Auth
+
+All `PUT`, `POST`, and `DELETE` operations require a bearer token. Some `GET` requests do too.
+
+To inject a bearer token into the request, pass a [hapi request object](http://hapijs.com/api#request-object) as the last argument, or an object with a `bearer` string:
+
+```js
+npm.collaborators.get('@npm/foo', {hapiRequest: request})
+// or
+npm.collaborators.get('@npm/foo', {bearer: 'zeke'})
+```
+
+## Caching
+
+To enable the built-in redis cache, set `ACL_CLIENT_REDIS_URL` in the environment before
+requiring the client. To cache a request, specify a TTL in seconds or a human-friendly
+string like `5 hours` or `20 minutes`.
+
+```js
+// set this _before_ requiring the module
+process.env.ACL_CLIENT_REDIS_URL = 'redis://localhost:6379'
+
+// initialize the client. The redis instance will be attached to each method
+var npm = require('npm-api-client')()
+
+// set a `ttl` option in seconds
+npm.packages.get('browserify', {ttl: 60})
+
+// or use a human-friendly string
+npm.packages.get('browserify', {ttl: '2 hours'})
+```
+
+To invalidate the cache for a specific request, call that request's `cache.drop` method,
+passing the same arguments used when making the initial request:
+
+```js
+npm.packages.get.cache.drop('browserify')
+  .then(function(){
+    // bye-bye browserify
+  })
+```
+
+Note: the optional `options` object used to initially make the request, e.g.
+`{ttl: 60, logger: null}`, need not be present when calling `cache.drop()`
+
+## Environment Variables
+
+- `ACL_CLIENT_HOST` (required): the hostname (and optional port) to make requests to, sans `http(s)` scheme.
+- `ACL_CLIENT_CUSTOMER_HOST` (optional): the hostname for `npm.customer` requests
+- `ACL_CLIENT_REDIS_URL` (optional): a redis instance for caching request responses
+
+## API
+
+See [dist/operations.json](dist/operations.json) for more details about the methods below.
+
+{{#each operations}}
+#### `{{signature}}`
+
+- {{description}}
+- {{method}} {{path}}
+
+{{/each}}
+
+
+## How it Works
+
+[src/operations.yml](src/operations.yml) defines a list of http operations. An operation looks like this:
+
+```yml
+name: packages.get
+description: Get metadata for a specific npm package
+path: /package/{name}
+method: GET
+```
+
+When you `require('acl-client')()`, the [index](src/index.js) iterates over each
+operation in the schema and binds a [reusable request function](src/operate.js) to each. The end result
+is a tree of functions, namespaced by their dot-delimited `name` property from the schema:
+
+```
+packages: {
+  get: [Function],
+  list: [Function],
+  count: [Function],
+  star: [Function],
+  perms: [Function],
+  delete: [Function],
+  create: [Function],
+  getDefaultTeam: [Function]
+},
+collaborators: {
+  list: [Function],
+  add: [Function],
+  update: [Function],
+  delete: [Function]
+},
+...
+```
